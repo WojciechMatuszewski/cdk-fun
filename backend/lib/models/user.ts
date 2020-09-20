@@ -50,7 +50,7 @@ class UserModel {
 
     if (!result.Item) return null;
 
-    return this.fromItem(result.Item as UserItem);
+    return this.fromUserItem(result.Item as UserItem);
   }
 
   private toKey(id: string): UserKey {
@@ -75,7 +75,7 @@ class UserModel {
     };
   }
 
-  private fromItem(userItem: UserItem): User {
+  private fromUserItem(userItem: UserItem): User {
     return {
       id: this.fromKey({ pk: userItem.pk, sk: userItem.sk }),
       email: userItem.email,

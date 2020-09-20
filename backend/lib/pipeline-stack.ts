@@ -40,6 +40,7 @@ export class PipelineStack extends cdk.Stack {
           build: {
             commands: [
               "cd backend",
+              "npm run install --silent",
               "ls -l",
               "npm run build-cdk",
               "npm run synth"
