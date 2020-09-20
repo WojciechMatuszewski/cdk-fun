@@ -38,7 +38,8 @@ export class CognitoConstruct extends cdk.Construct {
       userPool: cognitoUserPool,
       authFlows: {
         userPassword: true,
-        refreshToken: true
+        refreshToken: true,
+        userSrp: true
       },
       generateSecret: false,
       supportedIdentityProviders: [
