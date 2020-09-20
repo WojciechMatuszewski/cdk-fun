@@ -6,11 +6,11 @@
   },
   "scripts": {
     "build-cdk": "node build cdk",
-    "build-lambdas": "node build lambdas",
-    "build": "rm -rf build && npm run build-cdk && npm run build-lambdas",
-    "synth": "rm -rf build/cdk.out && npm run cdk synth -- -o build",
-    "bootstrap": "npm run build && npm run cdk bootstrap -- -o build",
-    "deploy": "npm run build && npm run synth && npm run cdk deploy -- -a build",
+    "build-functions": "node build functions",
+    "build": "rm -rf build && npm run build-cdk",
+    "synth": "rm -rf cdk-build/cdk.out && npm run cdk synth -- -o cdk-build",
+    "bootstrap": "npm run build && npm run cdk bootstrap -- -o cdk-build",
+    "deploy": "npm run build && npm run synth && npm run cdk deploy -- -a cdk-build",
     "watch": "tsnd --respawn **/*.ts",
     "cdk": "cdk"
   },

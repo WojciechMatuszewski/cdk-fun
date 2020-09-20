@@ -13,25 +13,41 @@ export class PipelineStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props: PipelineStackProps) {
     super(scope, id, props);
 
-    const buildProject = new codebuild.PipelineProject(this, "build", {
+    const buildCDK = new codebuild.PipelineProject(this, "cdk-build", {
       buildSpec: codebuild.BuildSpec.fromObject({
         version: "0.2",
         phases: {
           install: {
-            commands: [
-              "echo 'it works'",
-              "ls -l",
-              "cd backend",
-              "npm install --silent"
-            ]
+            commands: ["cd backend", "npm install --silent"]
           },
           build: {
-            commands: ["npm run build", "npm run synth", "ls"]
+            commands: ["npm run build-cdk", "npm run synth"]
           }
         },
         artifacts: {
-          "base-directory": "./backend/build",
-          files: ["wojtek-tinder-backend-dev.template.json", "functions/**/*"]
+          "base-directory": "./backend/cdk-build",
+          files: ["wojtek-tinder-backend-dev.template.json"]
+        }
+      }),
+      environment: {
+        buildImage: codebuild.LinuxBuildImage.STANDARD_4_0
+      }
+    });
+
+    const buildFunctions = new codebuild.PipelineProject(this, "lambda-build", {
+      buildSpec: codebuild.BuildSpec.fromObject({
+        version: "0.2",
+        phases: {
+          install: {
+            commands: ["cd backend", "npm install --silent"]
+          },
+          build: {
+            commands: ["npm run build-functions"]
+          }
+        },
+        artifacts: {
+          "base-directory": "./backend/functions-build",
+          files: ["**/*"]
         }
       }),
       environment: {
@@ -40,7 +56,10 @@ export class PipelineStack extends cdk.Stack {
     });
 
     const sourceOutput = new codepipeline.Artifact();
-    const buildOutput = new codepipeline.Artifact("buildOutput");
+    const cdkBuildOutput = new codepipeline.Artifact("cdkBuildOutput");
+    const functionsBuildOutput = new codepipeline.Artifact(
+      "functionsBuildOutput"
+    );
 
     new codepipeline.Pipeline(this, "pipeline", {
       stages: [
@@ -61,10 +80,23 @@ export class PipelineStack extends cdk.Stack {
           stageName: "Build",
           actions: [
             new codepipelineActions.CodeBuildAction({
-              actionName: "build",
-              project: buildProject,
+              actionName: "BuildCDK",
+              project: buildCDK,
               input: sourceOutput,
-              outputs: [buildOutput]
+              outputs: [cdkBuildOutput],
+              runOrder: 1
+            })
+          ]
+        },
+        {
+          stageName: "Build",
+          actions: [
+            new codepipelineActions.CodeBuildAction({
+              actionName: "BuildFunctions",
+              project: buildFunctions,
+              input: sourceOutput,
+              outputs: [functionsBuildOutput],
+              runOrder: 1
             })
           ]
         },
@@ -72,16 +104,16 @@ export class PipelineStack extends cdk.Stack {
           stageName: "Deploy",
           actions: [
             new codepipelineActions.CloudFormationCreateUpdateStackAction({
-              actionName: "cfnDeploy",
-              templatePath: buildOutput.atPath(
+              actionName: "CFNDeploy",
+              templatePath: cdkBuildOutput.atPath(
                 "wojtek-tinder-backend-dev.template.json"
               ),
               stackName: "LambdaDeploymentStack",
               adminPermissions: true,
               parameterOverrides: {
-                ...props.lambdaCode.assign(buildOutput.s3Location)
+                ...props.lambdaCode.assign(functionsBuildOutput.s3Location)
               },
-              extraInputs: [buildOutput]
+              extraInputs: [functionsBuildOutput]
             })
           ]
         }

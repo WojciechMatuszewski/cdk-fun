@@ -14,20 +14,20 @@ async function buildCDK() {
     entryPoints,
     minify: false,
     bundle: false,
-    outdir: "build",
+    outdir: "cdk-build",
     tsconfig: "./tsconfig.json",
     format: "cjs"
   });
 }
 
-async function buildLambdas() {
+async function buildFunctions() {
   const entryPoints = await fg(["./functions/**/*.ts", "!node_modules"]);
 
   await build({
     entryPoints,
     minify: true,
     bundle: true,
-    outdir: "build/functions",
+    outdir: "functions-build",
     platform: "node",
     target: "node12",
     format: "cjs",
@@ -38,7 +38,7 @@ async function buildLambdas() {
 (() => {
   if (whatToBuild === "cdk") return buildCDK();
 
-  if (whatToBuild === "lambdas") return buildLambdas();
+  if (whatToBuild === "functions") return buildFunctions();
 
   throw new Error(`unknown target ${whatToBuild}`);
 })();
