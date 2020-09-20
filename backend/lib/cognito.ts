@@ -62,7 +62,10 @@ export class CognitoConstruct extends cdk.Construct {
       {
         code: props.lambdaCode,
         handler: "save-on-signup.handler",
-        runtime: lambda.Runtime.NODEJS_12_X
+        runtime: lambda.Runtime.NODEJS_12_X,
+        environment: {
+          TABLE_NAME: props.table.tableName
+        }
       }
     );
 
