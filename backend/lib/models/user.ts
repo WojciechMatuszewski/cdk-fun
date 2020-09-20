@@ -1,11 +1,18 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 
+interface Key {
+  pk: string;
+  sk: string;
+}
+
 type UserItem = {
   email: string;
   pk: string;
   sk: string;
   type: string;
   createdAt: string;
+  matchIndex: string | null;
+  alreadyMatched: string[];
 };
 
 type User = {
@@ -33,14 +40,34 @@ class UserModel {
       .promise();
   }
 
-  private toUserItem(user: User) {
-    const { id, ...restOfUser } = user;
+  public async getUser(id: string) {
+    const key = this.toKey(id);
+
+    const result = await this.db.get({
+      TableName: this.tableName,
+      Key: key
+    });
+  }
+
+  private toKey(id: string) {
     return {
       pk: `USER#${id}`,
-      sk: `USER#${id}`,
-      ...restOfUser
+      sk: `USER#${id}`
     };
   }
+
+  private toUserItem(user: User): UserItem {
+    const { id, ...restOfUser } = user;
+    return {
+      ...this.toKey(user.id),
+      ...restOfUser,
+      matchIndex: null,
+      type: "USER",
+      alreadyMatched: [user.id]
+    };
+  }
+
+  private fromItem(userItem: UserItem): User {}
 }
 
 export { UserModel, User };

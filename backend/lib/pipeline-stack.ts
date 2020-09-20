@@ -12,24 +12,6 @@ export class PipelineStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props: PipelineStackProps) {
     super(scope, id, props);
 
-    const buildCDK = new codebuild.PipelineProject(this, "cdk-build", {
-      buildSpec: codebuild.BuildSpec.fromObject({
-        version: "0.2",
-        phases: {
-          build: {
-            commands: ["cd backend && npm run build-cdk", "npm run synth"]
-          }
-        },
-        artifacts: {
-          "base-directory": "./backend/cdk-build",
-          files: ["wojtek-tinder-backend-dev.template.json"]
-        }
-      }),
-      environment: {
-        buildImage: codebuild.LinuxBuildImage.STANDARD_4_0
-      }
-    });
-
     const installDependencies = new codebuild.PipelineProject(
       this,
       "install-deps",
@@ -51,12 +33,35 @@ export class PipelineStack extends cdk.Stack {
       }
     );
 
+    const buildCDK = new codebuild.PipelineProject(this, "cdk-build", {
+      buildSpec: codebuild.BuildSpec.fromObject({
+        version: "0.2",
+        phases: {
+          build: {
+            commands: [
+              "ls -l",
+              "cd backend",
+              "npm run build-cdk",
+              "npm run synth"
+            ]
+          }
+        },
+        artifacts: {
+          "base-directory": "./backend/cdk-build",
+          files: ["wojtek-tinder-backend-dev.template.json"]
+        }
+      }),
+      environment: {
+        buildImage: codebuild.LinuxBuildImage.STANDARD_4_0
+      }
+    });
+
     const buildFunctions = new codebuild.PipelineProject(this, "lambda-build", {
       buildSpec: codebuild.BuildSpec.fromObject({
         version: "0.2",
         phases: {
           build: {
-            commands: ["cd backend && npm run build-functions"]
+            commands: ["cd backend", " npm run build-functions"]
           }
         },
         artifacts: {
