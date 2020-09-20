@@ -54,7 +54,7 @@ export class ApiConstruct extends cdk.Construct {
     });
 
     new cdk.CfnOutput(this, "apiUrl", {
-      value: api.url ?? "something went wrong :c"
+      value: api.url || "something went wrong :c"
     });
   }
 }
