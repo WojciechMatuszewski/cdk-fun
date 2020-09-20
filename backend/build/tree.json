@@ -744,6 +744,38 @@
                                 }
                               },
                               "Resource": "*"
+                            },
+                            {
+                              "Action": [
+                                "kms:Decrypt",
+                                "kms:DescribeKey"
+                              ],
+                              "Effect": "Allow",
+                              "Principal": {
+                                "AWS": {
+                                  "Fn::GetAtt": [
+                                    "pipelineDeploycfnDeployRole38E60407",
+                                    "Arn"
+                                  ]
+                                }
+                              },
+                              "Resource": "*"
+                            },
+                            {
+                              "Action": [
+                                "kms:Decrypt",
+                                "kms:DescribeKey"
+                              ],
+                              "Effect": "Allow",
+                              "Principal": {
+                                "AWS": {
+                                  "Fn::GetAtt": [
+                                    "pipelineDeploycfnDeployCodePipelineActionRole6A23399C",
+                                    "Arn"
+                                  ]
+                                }
+                              },
+                              "Resource": "*"
                             }
                           ],
                           "Version": "2012-10-17"
@@ -910,6 +942,16 @@
                                       "Arn"
                                     ]
                                   }
+                                },
+                                {
+                                  "Action": "sts:AssumeRole",
+                                  "Effect": "Allow",
+                                  "Resource": {
+                                    "Fn::GetAtt": [
+                                      "pipelineDeploycfnDeployCodePipelineActionRole6A23399C",
+                                      "Arn"
+                                    ]
+                                  }
                                 }
                               ],
                               "Version": "2012-10-17"
@@ -997,6 +1039,45 @@
                             "roleArn": {
                               "Fn::GetAtt": [
                                 "pipelineBuildbuildCodePipelineActionRole2A07320C",
+                                "Arn"
+                              ]
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "name": "Deploy",
+                        "actions": [
+                          {
+                            "name": "cfnDeploy",
+                            "inputArtifacts": [
+                              {
+                                "name": "buildOutput"
+                              }
+                            ],
+                            "actionTypeId": {
+                              "category": "Deploy",
+                              "version": "1",
+                              "owner": "AWS",
+                              "provider": "CloudFormation"
+                            },
+                            "configuration": {
+                              "StackName": "LambdaDeploymentStack",
+                              "Capabilities": "CAPABILITY_NAMED_IAM",
+                              "RoleArn": {
+                                "Fn::GetAtt": [
+                                  "pipelineDeploycfnDeployRole38E60407",
+                                  "Arn"
+                                ]
+                              },
+                              "ParameterOverrides": "{\"ApifooHandlerLambdaSourceBucketNameParameter21241CBD\":{\"Fn::GetArtifactAtt\":[\"buildOutput\",\"BucketName\"]},\"ApifooHandlerLambdaSourceObjectKeyParameter535E921E\":{\"Fn::GetArtifactAtt\":[\"buildOutput\",\"ObjectKey\"]}}",
+                              "ActionMode": "CREATE_UPDATE",
+                              "TemplatePath": "buildOutput::wojtek-tinder-backend-dev.template.json"
+                            },
+                            "runOrder": 1,
+                            "roleArn": {
+                              "Fn::GetAtt": [
+                                "pipelineDeploycfnDeployCodePipelineActionRole6A23399C",
                                 "Arn"
                               ]
                             }
@@ -1140,6 +1221,272 @@
                                     "roles": [
                                       {
                                         "Ref": "pipelineBuildbuildCodePipelineActionRole2A07320C"
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "Deploy": {
+                "id": "Deploy",
+                "path": "wojtek-tinder-pipeline-dev/pipeline/Deploy",
+                "children": {
+                  "cfnDeploy": {
+                    "id": "cfnDeploy",
+                    "path": "wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy",
+                    "children": {
+                      "CodePipelineActionRole": {
+                        "id": "CodePipelineActionRole",
+                        "path": "wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/CodePipelineActionRole",
+                        "children": {
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/CodePipelineActionRole/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                              "aws:cdk:cloudformation:props": {
+                                "assumeRolePolicyDocument": {
+                                  "Statement": [
+                                    {
+                                      "Action": "sts:AssumeRole",
+                                      "Effect": "Allow",
+                                      "Principal": {
+                                        "AWS": {
+                                          "Fn::Join": [
+                                            "",
+                                            [
+                                              "arn:",
+                                              {
+                                                "Ref": "AWS::Partition"
+                                              },
+                                              ":iam::",
+                                              {
+                                                "Ref": "AWS::AccountId"
+                                              },
+                                              ":root"
+                                            ]
+                                          ]
+                                        }
+                                      }
+                                    }
+                                  ],
+                                  "Version": "2012-10-17"
+                                }
+                              }
+                            }
+                          },
+                          "8389e75f-0810-4838-bf64-d6f85a95cf83": {
+                            "id": "8389e75f-0810-4838-bf64-d6f85a95cf83",
+                            "path": "wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/CodePipelineActionRole/8389e75f-0810-4838-bf64-d6f85a95cf83"
+                          },
+                          "DefaultPolicy": {
+                            "id": "DefaultPolicy",
+                            "path": "wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/CodePipelineActionRole/DefaultPolicy",
+                            "children": {
+                              "Resource": {
+                                "id": "Resource",
+                                "path": "wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/CodePipelineActionRole/DefaultPolicy/Resource",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                                  "aws:cdk:cloudformation:props": {
+                                    "policyDocument": {
+                                      "Statement": [
+                                        {
+                                          "Action": "iam:PassRole",
+                                          "Effect": "Allow",
+                                          "Resource": {
+                                            "Fn::GetAtt": [
+                                              "pipelineDeploycfnDeployRole38E60407",
+                                              "Arn"
+                                            ]
+                                          }
+                                        },
+                                        {
+                                          "Action": [
+                                            "s3:GetObject*",
+                                            "s3:GetBucket*",
+                                            "s3:List*"
+                                          ],
+                                          "Effect": "Allow",
+                                          "Resource": [
+                                            {
+                                              "Fn::GetAtt": [
+                                                "pipelineArtifactsBucket7D04D0D2",
+                                                "Arn"
+                                              ]
+                                            },
+                                            {
+                                              "Fn::Join": [
+                                                "",
+                                                [
+                                                  {
+                                                    "Fn::GetAtt": [
+                                                      "pipelineArtifactsBucket7D04D0D2",
+                                                      "Arn"
+                                                    ]
+                                                  },
+                                                  "/*"
+                                                ]
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "Action": [
+                                            "kms:Decrypt",
+                                            "kms:DescribeKey"
+                                          ],
+                                          "Effect": "Allow",
+                                          "Resource": {
+                                            "Fn::GetAtt": [
+                                              "pipelineArtifactsBucketEncryptionKey16620CDF",
+                                              "Arn"
+                                            ]
+                                          }
+                                        },
+                                        {
+                                          "Action": [
+                                            "cloudformation:CreateStack",
+                                            "cloudformation:DescribeStack*",
+                                            "cloudformation:GetStackPolicy",
+                                            "cloudformation:GetTemplate*",
+                                            "cloudformation:SetStackPolicy",
+                                            "cloudformation:UpdateStack",
+                                            "cloudformation:ValidateTemplate"
+                                          ],
+                                          "Effect": "Allow",
+                                          "Resource": {
+                                            "Fn::Join": [
+                                              "",
+                                              [
+                                                "arn:",
+                                                {
+                                                  "Ref": "AWS::Partition"
+                                                },
+                                                ":cloudformation:eu-central-1:",
+                                                {
+                                                  "Ref": "AWS::AccountId"
+                                                },
+                                                ":stack/LambdaDeploymentStack/*"
+                                              ]
+                                            ]
+                                          }
+                                        }
+                                      ],
+                                      "Version": "2012-10-17"
+                                    },
+                                    "policyName": "pipelineDeploycfnDeployCodePipelineActionRoleDefaultPolicyAA174AC8",
+                                    "roles": [
+                                      {
+                                        "Ref": "pipelineDeploycfnDeployCodePipelineActionRole6A23399C"
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "Role": {
+                        "id": "Role",
+                        "path": "wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/Role",
+                        "children": {
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/Role/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                              "aws:cdk:cloudformation:props": {
+                                "assumeRolePolicyDocument": {
+                                  "Statement": [
+                                    {
+                                      "Action": "sts:AssumeRole",
+                                      "Effect": "Allow",
+                                      "Principal": {
+                                        "Service": "cloudformation.amazonaws.com"
+                                      }
+                                    }
+                                  ],
+                                  "Version": "2012-10-17"
+                                }
+                              }
+                            }
+                          },
+                          "DefaultPolicy": {
+                            "id": "DefaultPolicy",
+                            "path": "wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/Role/DefaultPolicy",
+                            "children": {
+                              "Resource": {
+                                "id": "Resource",
+                                "path": "wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/Role/DefaultPolicy/Resource",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                                  "aws:cdk:cloudformation:props": {
+                                    "policyDocument": {
+                                      "Statement": [
+                                        {
+                                          "Action": [
+                                            "s3:GetObject*",
+                                            "s3:GetBucket*",
+                                            "s3:List*"
+                                          ],
+                                          "Effect": "Allow",
+                                          "Resource": [
+                                            {
+                                              "Fn::GetAtt": [
+                                                "pipelineArtifactsBucket7D04D0D2",
+                                                "Arn"
+                                              ]
+                                            },
+                                            {
+                                              "Fn::Join": [
+                                                "",
+                                                [
+                                                  {
+                                                    "Fn::GetAtt": [
+                                                      "pipelineArtifactsBucket7D04D0D2",
+                                                      "Arn"
+                                                    ]
+                                                  },
+                                                  "/*"
+                                                ]
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "Action": [
+                                            "kms:Decrypt",
+                                            "kms:DescribeKey"
+                                          ],
+                                          "Effect": "Allow",
+                                          "Resource": {
+                                            "Fn::GetAtt": [
+                                              "pipelineArtifactsBucketEncryptionKey16620CDF",
+                                              "Arn"
+                                            ]
+                                          }
+                                        },
+                                        {
+                                          "Action": "*",
+                                          "Effect": "Allow",
+                                          "Resource": "*"
+                                        }
+                                      ],
+                                      "Version": "2012-10-17"
+                                    },
+                                    "policyName": "pipelineDeploycfnDeployRoleDefaultPolicy07B3A8DC",
+                                    "roles": [
+                                      {
+                                        "Ref": "pipelineDeploycfnDeployRole38E60407"
                                       }
                                     ]
                                   }

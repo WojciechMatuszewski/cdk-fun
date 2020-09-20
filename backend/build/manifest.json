@@ -549,6 +549,117 @@
               "internal/main/run_main_module.js:17:47"
             ]
           }
+        ],
+        "/wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/CodePipelineActionRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "pipelineDeploycfnDeployCodePipelineActionRole6A23399C",
+            "trace": [
+              "new Role (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-iam/lib/role.ts:326:18)",
+              "Pipeline.getRoleForAction (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.ts:562:20)",
+              "Pipeline._attachActionToPipeline (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.ts:371:29)",
+              "Stage.attachActionToPipeline (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/stage.ts:141:27)",
+              "Stage.addAction (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/stage.ts:91:29)",
+              "new Stage (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/stage.ts:38:12)",
+              "Pipeline.addStage (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.ts:302:19)",
+              "new Pipeline (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.ts:286:12)",
+              "new PipelineStack (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/build/lib/pipeline-stack.js:62:5)",
+              "Object.<anonymous> (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/build/bin/backend.js:30:1)",
+              "Module._compile (internal/modules/cjs/loader.js:1075:30)",
+              "Object.Module._extensions..js (internal/modules/cjs/loader.js:1096:10)",
+              "Module.load (internal/modules/cjs/loader.js:940:32)",
+              "Function.Module._load (internal/modules/cjs/loader.js:781:14)",
+              "Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:72:12)",
+              "internal/main/run_main_module.js:17:47"
+            ]
+          }
+        ],
+        "/wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/CodePipelineActionRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "pipelineDeploycfnDeployCodePipelineActionRoleDefaultPolicyAA174AC8",
+            "trace": [
+              "new Policy (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-iam/lib/policy.ts:140:22)",
+              "Role.addToPrincipalPolicy (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-iam/lib/role.ts:367:28)",
+              "Role.addToPolicy (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-iam/lib/role.ts:375:17)",
+              "SingletonPolicy.statementFor (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline-actions/lib/cloudformation/pipeline-actions.ts:577:17)",
+              "SingletonPolicy.grantPassRole (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline-actions/lib/cloudformation/pipeline-actions.ts:567:10)",
+              "CloudFormationCreateUpdateStackAction.bound (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline-actions/lib/cloudformation/pipeline-actions.ts:298:43)",
+              "CloudFormationCreateUpdateStackAction.bound (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline-actions/lib/cloudformation/pipeline-actions.ts:434:32)",
+              "CloudFormationCreateUpdateStackAction.bind (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline-actions/lib/action.ts:59:17)",
+              "Pipeline._attachActionToPipeline (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.ts:377:33)",
+              "Stage.attachActionToPipeline (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/stage.ts:141:27)",
+              "Stage.addAction (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/stage.ts:91:29)",
+              "new Stage (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/stage.ts:38:12)",
+              "Pipeline.addStage (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.ts:302:19)",
+              "new Pipeline (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.ts:286:12)",
+              "new PipelineStack (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/build/lib/pipeline-stack.js:62:5)",
+              "Object.<anonymous> (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/build/bin/backend.js:30:1)",
+              "Module._compile (internal/modules/cjs/loader.js:1075:30)",
+              "Object.Module._extensions..js (internal/modules/cjs/loader.js:1096:10)",
+              "Module.load (internal/modules/cjs/loader.js:940:32)",
+              "Function.Module._load (internal/modules/cjs/loader.js:781:14)",
+              "Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:72:12)",
+              "internal/main/run_main_module.js:17:47"
+            ]
+          }
+        ],
+        "/wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/Role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "pipelineDeploycfnDeployRole38E60407",
+            "trace": [
+              "new Role (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-iam/lib/role.ts:326:18)",
+              "CloudFormationCreateUpdateStackAction.bound (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline-actions/lib/cloudformation/pipeline-actions.ts:278:32)",
+              "CloudFormationCreateUpdateStackAction.bound (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline-actions/lib/cloudformation/pipeline-actions.ts:434:32)",
+              "CloudFormationCreateUpdateStackAction.bind (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline-actions/lib/action.ts:59:17)",
+              "Pipeline._attachActionToPipeline (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.ts:377:33)",
+              "Stage.attachActionToPipeline (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/stage.ts:141:27)",
+              "Stage.addAction (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/stage.ts:91:29)",
+              "new Stage (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/stage.ts:38:12)",
+              "Pipeline.addStage (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.ts:302:19)",
+              "new Pipeline (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.ts:286:12)",
+              "new PipelineStack (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/build/lib/pipeline-stack.js:62:5)",
+              "Object.<anonymous> (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/build/bin/backend.js:30:1)",
+              "Module._compile (internal/modules/cjs/loader.js:1075:30)",
+              "Object.Module._extensions..js (internal/modules/cjs/loader.js:1096:10)",
+              "Module.load (internal/modules/cjs/loader.js:940:32)",
+              "Function.Module._load (internal/modules/cjs/loader.js:781:14)",
+              "Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:72:12)",
+              "internal/main/run_main_module.js:17:47"
+            ]
+          }
+        ],
+        "/wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/Role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "pipelineDeploycfnDeployRoleDefaultPolicy07B3A8DC",
+            "trace": [
+              "new Policy (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-iam/lib/policy.ts:140:22)",
+              "Role.addToPrincipalPolicy (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-iam/lib/role.ts:367:28)",
+              "Function.addToPrincipal (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-iam/lib/grant.ts:168:61)",
+              "Function.addToPrincipalOrResource (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-iam/lib/grant.ts:119:26)",
+              "Bucket.grant (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-s3/lib/bucket.ts:650:27)",
+              "Bucket.grantRead (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-s3/lib/bucket.ts:522:17)",
+              "CloudFormationCreateUpdateStackAction.bound (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline-actions/lib/cloudformation/pipeline-actions.ts:288:22)",
+              "CloudFormationCreateUpdateStackAction.bound (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline-actions/lib/cloudformation/pipeline-actions.ts:434:32)",
+              "CloudFormationCreateUpdateStackAction.bind (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline-actions/lib/action.ts:59:17)",
+              "Pipeline._attachActionToPipeline (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.ts:377:33)",
+              "Stage.attachActionToPipeline (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/stage.ts:141:27)",
+              "Stage.addAction (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/stage.ts:91:29)",
+              "new Stage (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/stage.ts:38:12)",
+              "Pipeline.addStage (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.ts:302:19)",
+              "new Pipeline (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/node_modules/@aws-cdk/aws-codepipeline/lib/pipeline.ts:286:12)",
+              "new PipelineStack (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/build/lib/pipeline-stack.js:62:5)",
+              "Object.<anonymous> (/Users/wn.matuszewski/Desktop/JS/cdk-tinder/backend/build/bin/backend.js:30:1)",
+              "Module._compile (internal/modules/cjs/loader.js:1075:30)",
+              "Object.Module._extensions..js (internal/modules/cjs/loader.js:1096:10)",
+              "Module.load (internal/modules/cjs/loader.js:940:32)",
+              "Function.Module._load (internal/modules/cjs/loader.js:781:14)",
+              "Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:72:12)",
+              "internal/main/run_main_module.js:17:47"
+            ]
+          }
         ]
       }
     }

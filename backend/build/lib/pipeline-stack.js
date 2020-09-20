@@ -84,6 +84,21 @@ class PipelineStack extends cdk.Stack {
               outputs: [buildOutput]
             })
           ]
+        },
+        {
+          stageName: "Deploy",
+          actions: [
+            new codepipelineActions.CloudFormationCreateUpdateStackAction({
+              actionName: "cfnDeploy",
+              templatePath: buildOutput.atPath("wojtek-tinder-backend-dev.template.json"),
+              stackName: "LambdaDeploymentStack",
+              adminPermissions: true,
+              parameterOverrides: {
+                ...props.lambdaCode.assign(buildOutput.s3Location)
+              },
+              extraInputs: [buildOutput]
+            })
+          ]
         }
       ]
     });

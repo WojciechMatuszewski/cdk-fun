@@ -313,6 +313,38 @@
                 }
               },
               "Resource": "*"
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::GetAtt": [
+                    "pipelineDeploycfnDeployRole38E60407",
+                    "Arn"
+                  ]
+                }
+              },
+              "Resource": "*"
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::GetAtt": [
+                    "pipelineDeploycfnDeployCodePipelineActionRole6A23399C",
+                    "Arn"
+                  ]
+                }
+              },
+              "Resource": "*"
             }
           ],
           "Version": "2012-10-17"
@@ -455,6 +487,16 @@
                   "Arn"
                 ]
               }
+            },
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "pipelineDeploycfnDeployCodePipelineActionRole6A23399C",
+                  "Arn"
+                ]
+              }
             }
           ],
           "Version": "2012-10-17"
@@ -542,6 +584,45 @@
               }
             ],
             "Name": "Build"
+          },
+          {
+            "Actions": [
+              {
+                "ActionTypeId": {
+                  "Category": "Deploy",
+                  "Owner": "AWS",
+                  "Provider": "CloudFormation",
+                  "Version": "1"
+                },
+                "Configuration": {
+                  "StackName": "LambdaDeploymentStack",
+                  "Capabilities": "CAPABILITY_NAMED_IAM",
+                  "RoleArn": {
+                    "Fn::GetAtt": [
+                      "pipelineDeploycfnDeployRole38E60407",
+                      "Arn"
+                    ]
+                  },
+                  "ParameterOverrides": "{\"ApifooHandlerLambdaSourceBucketNameParameter21241CBD\":{\"Fn::GetArtifactAtt\":[\"buildOutput\",\"BucketName\"]},\"ApifooHandlerLambdaSourceObjectKeyParameter535E921E\":{\"Fn::GetArtifactAtt\":[\"buildOutput\",\"ObjectKey\"]}}",
+                  "ActionMode": "CREATE_UPDATE",
+                  "TemplatePath": "buildOutput::wojtek-tinder-backend-dev.template.json"
+                },
+                "InputArtifacts": [
+                  {
+                    "Name": "buildOutput"
+                  }
+                ],
+                "Name": "cfnDeploy",
+                "RoleArn": {
+                  "Fn::GetAtt": [
+                    "pipelineDeploycfnDeployCodePipelineActionRole6A23399C",
+                    "Arn"
+                  ]
+                },
+                "RunOrder": 1
+              }
+            ],
+            "Name": "Deploy"
           }
         ],
         "ArtifactStore": {
@@ -658,6 +739,228 @@
       },
       "Metadata": {
         "aws:cdk:path": "wojtek-tinder-pipeline-dev/pipeline/Build/build/CodePipelineActionRole/DefaultPolicy/Resource"
+      }
+    },
+    "pipelineDeploycfnDeployCodePipelineActionRole6A23399C": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":iam::",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":root"
+                    ]
+                  ]
+                }
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/CodePipelineActionRole/Resource"
+      }
+    },
+    "pipelineDeploycfnDeployCodePipelineActionRoleDefaultPolicyAA174AC8": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "iam:PassRole",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "pipelineDeploycfnDeployRole38E60407",
+                  "Arn"
+                ]
+              }
+            },
+            {
+              "Action": [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "pipelineArtifactsBucket7D04D0D2",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "pipelineArtifactsBucket7D04D0D2",
+                          "Arn"
+                        ]
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "pipelineArtifactsBucketEncryptionKey16620CDF",
+                  "Arn"
+                ]
+              }
+            },
+            {
+              "Action": [
+                "cloudformation:CreateStack",
+                "cloudformation:DescribeStack*",
+                "cloudformation:GetStackPolicy",
+                "cloudformation:GetTemplate*",
+                "cloudformation:SetStackPolicy",
+                "cloudformation:UpdateStack",
+                "cloudformation:ValidateTemplate"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":cloudformation:eu-central-1:",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":stack/LambdaDeploymentStack/*"
+                  ]
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "pipelineDeploycfnDeployCodePipelineActionRoleDefaultPolicyAA174AC8",
+        "Roles": [
+          {
+            "Ref": "pipelineDeploycfnDeployCodePipelineActionRole6A23399C"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/CodePipelineActionRole/DefaultPolicy/Resource"
+      }
+    },
+    "pipelineDeploycfnDeployRole38E60407": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "cloudformation.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/Role/Resource"
+      }
+    },
+    "pipelineDeploycfnDeployRoleDefaultPolicy07B3A8DC": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "pipelineArtifactsBucket7D04D0D2",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "pipelineArtifactsBucket7D04D0D2",
+                          "Arn"
+                        ]
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "pipelineArtifactsBucketEncryptionKey16620CDF",
+                  "Arn"
+                ]
+              }
+            },
+            {
+              "Action": "*",
+              "Effect": "Allow",
+              "Resource": "*"
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "pipelineDeploycfnDeployRoleDefaultPolicy07B3A8DC",
+        "Roles": [
+          {
+            "Ref": "pipelineDeploycfnDeployRole38E60407"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "wojtek-tinder-pipeline-dev/pipeline/Deploy/cfnDeploy/Role/DefaultPolicy/Resource"
       }
     },
     "CDKMetadata": {
