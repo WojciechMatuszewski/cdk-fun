@@ -30,6 +30,7 @@ const api = __toModule(require("./api"));
 class BackendStack extends cdk.Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
-    new api.ApiConstruct(this, "Api");
+    const api2 = new api.ApiConstruct(this, "Api");
+    this.lambdaCode = api2.lambdaCode;
   }
 }

@@ -24,5 +24,10 @@ const backend_stack = __toModule(require("../lib/backend-stack"));
 const pipeline_stack = __toModule(require("../lib/pipeline-stack"));
 const app = new cdk.App();
 const env = {region: "eu-central-1"};
-new pipeline_stack.PipelineStack(app, "wojtek-tinder-pipeline-dev", {env});
-new backend_stack.BackendStack(app, "wojtek-tinder-backend-dev", {env});
+const backendStack = new backend_stack.BackendStack(app, "wojtek-tinder-backend-dev", {
+  env
+});
+new pipeline_stack.PipelineStack(app, "wojtek-tinder-pipeline-dev", {
+  env,
+  lambdaCode: backendStack.lambdaCode
+});

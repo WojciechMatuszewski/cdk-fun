@@ -9,6 +9,7 @@
     "build-lambdas": "node build lambdas",
     "build": "rm -rf build && npm run build-cdk && npm run build-lambdas",
     "synth": "rm -rf build/cdk.out && npm run cdk synth -- -o build",
+    "bootstrap": "npm run build && npm run cdk bootstrap -- -o build",
     "watch": "tsnd --respawn **/*.ts",
     "cdk": "cdk"
   },

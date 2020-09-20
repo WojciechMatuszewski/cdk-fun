@@ -1,9 +1,669 @@
 {
   "Resources": {
+    "buildRoleD55766F0": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "codebuild.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "wojtek-tinder-pipeline-dev/build/Role/Resource"
+      }
+    },
+    "buildRoleDefaultPolicy62B19ADE": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":logs:eu-central-1:",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":log-group:/aws/codebuild/",
+                      {
+                        "Ref": "buildB0080CFE"
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":logs:eu-central-1:",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":log-group:/aws/codebuild/",
+                      {
+                        "Ref": "buildB0080CFE"
+                      },
+                      ":*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "codebuild:CreateReportGroup",
+                "codebuild:CreateReport",
+                "codebuild:UpdateReport",
+                "codebuild:BatchPutTestCases"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":codebuild:eu-central-1:",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":report-group/",
+                    {
+                      "Ref": "buildB0080CFE"
+                    },
+                    "-*"
+                  ]
+                ]
+              }
+            },
+            {
+              "Action": [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+                "s3:PutObject*",
+                "s3:Abort*"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "pipelineArtifactsBucket7D04D0D2",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "pipelineArtifactsBucket7D04D0D2",
+                          "Arn"
+                        ]
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:Encrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "pipelineArtifactsBucketEncryptionKey16620CDF",
+                  "Arn"
+                ]
+              }
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:Encrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "pipelineArtifactsBucketEncryptionKey16620CDF",
+                  "Arn"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "buildRoleDefaultPolicy62B19ADE",
+        "Roles": [
+          {
+            "Ref": "buildRoleD55766F0"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "wojtek-tinder-pipeline-dev/build/Role/DefaultPolicy/Resource"
+      }
+    },
+    "buildB0080CFE": {
+      "Type": "AWS::CodeBuild::Project",
+      "Properties": {
+        "Artifacts": {
+          "Type": "CODEPIPELINE"
+        },
+        "Environment": {
+          "ComputeType": "BUILD_GENERAL1_SMALL",
+          "Image": "aws/codebuild/standard:4.0",
+          "PrivilegedMode": false,
+          "Type": "LINUX_CONTAINER"
+        },
+        "ServiceRole": {
+          "Fn::GetAtt": [
+            "buildRoleD55766F0",
+            "Arn"
+          ]
+        },
+        "Source": {
+          "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"install\": {\n      \"commands\": \"npm install --silent\"\n    },\n    \"build\": {\n      \"commands\": [\n        \"npm run build\",\n        \"npm run synth\"\n      ]\n    }\n  },\n  \"artifacts\": {\n    \"base-directory\": \"build\",\n    \"files\": [\n      \"wojtek-tinder-backend-dev.template.json\",\n      \"functions/**/*\"\n    ]\n  }\n}",
+          "Type": "CODEPIPELINE"
+        },
+        "EncryptionKey": {
+          "Fn::GetAtt": [
+            "pipelineArtifactsBucketEncryptionKey16620CDF",
+            "Arn"
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "wojtek-tinder-pipeline-dev/build/Resource"
+      }
+    },
+    "pipelineArtifactsBucketEncryptionKey16620CDF": {
+      "Type": "AWS::KMS::Key",
+      "Properties": {
+        "KeyPolicy": {
+          "Statement": [
+            {
+              "Action": [
+                "kms:Create*",
+                "kms:Describe*",
+                "kms:Enable*",
+                "kms:List*",
+                "kms:Put*",
+                "kms:Update*",
+                "kms:Revoke*",
+                "kms:Disable*",
+                "kms:Get*",
+                "kms:Delete*",
+                "kms:ScheduleKeyDeletion",
+                "kms:CancelKeyDeletion",
+                "kms:GenerateDataKey",
+                "kms:TagResource",
+                "kms:UntagResource"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":iam::",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":root"
+                    ]
+                  ]
+                }
+              },
+              "Resource": "*"
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:Encrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::GetAtt": [
+                    "pipelineRole55399C5D",
+                    "Arn"
+                  ]
+                }
+              },
+              "Resource": "*"
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:Encrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::GetAtt": [
+                    "buildRoleD55766F0",
+                    "Arn"
+                  ]
+                }
+              },
+              "Resource": "*"
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:Encrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::GetAtt": [
+                    "buildRoleD55766F0",
+                    "Arn"
+                  ]
+                }
+              },
+              "Resource": "*"
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "wojtek-tinder-pipeline-dev/pipeline/ArtifactsBucketEncryptionKey/Resource"
+      }
+    },
+    "pipelineArtifactsBucket7D04D0D2": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "KMSMasterKeyID": {
+                  "Fn::GetAtt": [
+                    "pipelineArtifactsBucketEncryptionKey16620CDF",
+                    "Arn"
+                  ]
+                },
+                "SSEAlgorithm": "aws:kms"
+              }
+            }
+          ]
+        },
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true
+        }
+      },
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Retain",
+      "Metadata": {
+        "aws:cdk:path": "wojtek-tinder-pipeline-dev/pipeline/ArtifactsBucket/Resource"
+      }
+    },
+    "pipelineArtifactsBucketEncryptionKeyAlias2DB3E5DA": {
+      "Type": "AWS::KMS::Alias",
+      "Properties": {
+        "AliasName": "alias/codepipeline-wojtektinderpipelinedevpipelinea807c002",
+        "TargetKeyId": {
+          "Fn::GetAtt": [
+            "pipelineArtifactsBucketEncryptionKey16620CDF",
+            "Arn"
+          ]
+        }
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "wojtek-tinder-pipeline-dev/pipeline/ArtifactsBucketEncryptionKeyAlias/Resource"
+      }
+    },
+    "pipelineRole55399C5D": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "codepipeline.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "wojtek-tinder-pipeline-dev/pipeline/Role/Resource"
+      }
+    },
+    "pipelineRoleDefaultPolicy668B05DE": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+                "s3:PutObject*",
+                "s3:Abort*"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "pipelineArtifactsBucket7D04D0D2",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "pipelineArtifactsBucket7D04D0D2",
+                          "Arn"
+                        ]
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:Encrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "pipelineArtifactsBucketEncryptionKey16620CDF",
+                  "Arn"
+                ]
+              }
+            },
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "pipelineBuildbuildCodePipelineActionRole2A07320C",
+                  "Arn"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "pipelineRoleDefaultPolicy668B05DE",
+        "Roles": [
+          {
+            "Ref": "pipelineRole55399C5D"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "wojtek-tinder-pipeline-dev/pipeline/Role/DefaultPolicy/Resource"
+      }
+    },
+    "pipelineDBECAE49": {
+      "Type": "AWS::CodePipeline::Pipeline",
+      "Properties": {
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "pipelineRole55399C5D",
+            "Arn"
+          ]
+        },
+        "Stages": [
+          {
+            "Actions": [
+              {
+                "ActionTypeId": {
+                  "Category": "Source",
+                  "Owner": "ThirdParty",
+                  "Provider": "GitHub",
+                  "Version": "1"
+                },
+                "Configuration": {
+                  "Owner": "WojciechMatuszewski",
+                  "Repo": "cdk-fun",
+                  "Branch": "master",
+                  "OAuthToken": "{{resolve:secretsmanager:WojtekGHKey:SecretString:::}}",
+                  "PollForSourceChanges": false
+                },
+                "Name": "Checkout",
+                "OutputArtifacts": [
+                  {
+                    "Name": "Artifact_Source_Checkout"
+                  }
+                ],
+                "RunOrder": 1
+              }
+            ],
+            "Name": "Source"
+          },
+          {
+            "Actions": [
+              {
+                "ActionTypeId": {
+                  "Category": "Build",
+                  "Owner": "AWS",
+                  "Provider": "CodeBuild",
+                  "Version": "1"
+                },
+                "Configuration": {
+                  "ProjectName": {
+                    "Ref": "buildB0080CFE"
+                  }
+                },
+                "InputArtifacts": [
+                  {
+                    "Name": "Artifact_Source_Checkout"
+                  }
+                ],
+                "Name": "build",
+                "OutputArtifacts": [
+                  {
+                    "Name": "buildOutput"
+                  }
+                ],
+                "RoleArn": {
+                  "Fn::GetAtt": [
+                    "pipelineBuildbuildCodePipelineActionRole2A07320C",
+                    "Arn"
+                  ]
+                },
+                "RunOrder": 1
+              }
+            ],
+            "Name": "Build"
+          }
+        ],
+        "ArtifactStore": {
+          "EncryptionKey": {
+            "Id": {
+              "Fn::GetAtt": [
+                "pipelineArtifactsBucketEncryptionKey16620CDF",
+                "Arn"
+              ]
+            },
+            "Type": "KMS"
+          },
+          "Location": {
+            "Ref": "pipelineArtifactsBucket7D04D0D2"
+          },
+          "Type": "S3"
+        }
+      },
+      "DependsOn": [
+        "pipelineRoleDefaultPolicy668B05DE",
+        "pipelineRole55399C5D"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "wojtek-tinder-pipeline-dev/pipeline/Resource"
+      }
+    },
+    "pipelineSourceCheckoutWebhookResourceBCD0D250": {
+      "Type": "AWS::CodePipeline::Webhook",
+      "Properties": {
+        "Authentication": "GITHUB_HMAC",
+        "AuthenticationConfiguration": {
+          "SecretToken": "{{resolve:secretsmanager:WojtekGHKey:SecretString:::}}"
+        },
+        "Filters": [
+          {
+            "JsonPath": "$.ref",
+            "MatchEquals": "refs/heads/{Branch}"
+          }
+        ],
+        "TargetAction": "Checkout",
+        "TargetPipeline": {
+          "Ref": "pipelineDBECAE49"
+        },
+        "TargetPipelineVersion": 1,
+        "RegisterWithThirdParty": true
+      },
+      "Metadata": {
+        "aws:cdk:path": "wojtek-tinder-pipeline-dev/pipeline/Source/Checkout/WebhookResource"
+      }
+    },
+    "pipelineBuildbuildCodePipelineActionRole2A07320C": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":iam::",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":root"
+                    ]
+                  ]
+                }
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "wojtek-tinder-pipeline-dev/pipeline/Build/build/CodePipelineActionRole/Resource"
+      }
+    },
+    "pipelineBuildbuildCodePipelineActionRoleDefaultPolicy0DAD9DA5": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "codebuild:BatchGetBuilds",
+                "codebuild:StartBuild",
+                "codebuild:StopBuild"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "buildB0080CFE",
+                  "Arn"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "pipelineBuildbuildCodePipelineActionRoleDefaultPolicy0DAD9DA5",
+        "Roles": [
+          {
+            "Ref": "pipelineBuildbuildCodePipelineActionRole2A07320C"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "wojtek-tinder-pipeline-dev/pipeline/Build/build/CodePipelineActionRole/DefaultPolicy/Resource"
+      }
+    },
     "CDKMetadata": {
       "Type": "AWS::CDK::Metadata",
       "Properties": {
-        "Modules": "aws-cdk=1.63.0,@aws-cdk/assets=1.63.0,@aws-cdk/aws-applicationautoscaling=1.63.0,@aws-cdk/aws-autoscaling-common=1.63.0,@aws-cdk/aws-cloudwatch=1.63.0,@aws-cdk/aws-codeguruprofiler=1.63.0,@aws-cdk/aws-ec2=1.63.0,@aws-cdk/aws-events=1.63.0,@aws-cdk/aws-iam=1.63.0,@aws-cdk/aws-kms=1.63.0,@aws-cdk/aws-lambda=1.63.0,@aws-cdk/aws-logs=1.63.0,@aws-cdk/aws-s3=1.63.0,@aws-cdk/aws-s3-assets=1.63.0,@aws-cdk/aws-sqs=1.63.0,@aws-cdk/aws-ssm=1.63.0,@aws-cdk/cloud-assembly-schema=1.63.0,@aws-cdk/core=1.63.0,@aws-cdk/cx-api=1.63.0,@aws-cdk/region-info=1.63.0,jsii-runtime=node.js/v14.9.0"
+        "Modules": "aws-cdk=1.63.0,@aws-cdk/assets=1.63.0,@aws-cdk/aws-apigatewayv2=1.63.0,@aws-cdk/aws-applicationautoscaling=1.63.0,@aws-cdk/aws-autoscaling=1.63.0,@aws-cdk/aws-autoscaling-common=1.63.0,@aws-cdk/aws-autoscaling-hooktargets=1.63.0,@aws-cdk/aws-cloudformation=1.63.0,@aws-cdk/aws-cloudwatch=1.63.0,@aws-cdk/aws-codebuild=1.63.0,@aws-cdk/aws-codeguruprofiler=1.63.0,@aws-cdk/aws-codepipeline=1.63.0,@aws-cdk/aws-codepipeline-actions=1.63.0,@aws-cdk/aws-ec2=1.63.0,@aws-cdk/aws-ecr=1.63.0,@aws-cdk/aws-ecr-assets=1.63.0,@aws-cdk/aws-ecs=1.63.0,@aws-cdk/aws-elasticloadbalancingv2=1.63.0,@aws-cdk/aws-events=1.63.0,@aws-cdk/aws-events-targets=1.63.0,@aws-cdk/aws-iam=1.63.0,@aws-cdk/aws-kms=1.63.0,@aws-cdk/aws-lambda=1.63.0,@aws-cdk/aws-logs=1.63.0,@aws-cdk/aws-s3=1.63.0,@aws-cdk/aws-s3-assets=1.63.0,@aws-cdk/aws-servicediscovery=1.63.0,@aws-cdk/aws-sns=1.63.0,@aws-cdk/aws-sns-subscriptions=1.63.0,@aws-cdk/aws-sqs=1.63.0,@aws-cdk/aws-ssm=1.63.0,@aws-cdk/cloud-assembly-schema=1.63.0,@aws-cdk/core=1.63.0,@aws-cdk/custom-resources=1.63.0,@aws-cdk/cx-api=1.63.0,@aws-cdk/region-info=1.63.0,jsii-runtime=node.js/v14.9.0"
       }
     }
   }

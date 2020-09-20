@@ -26,8 +26,61 @@ __export(exports, {
   PipelineStack: () => PipelineStack
 });
 const cdk = __toModule(require("@aws-cdk/core"));
+const codebuild = __toModule(require("@aws-cdk/aws-codebuild"));
+const codepipeline = __toModule(require("@aws-cdk/aws-codepipeline"));
+const codepipelineActions = __toModule(require("@aws-cdk/aws-codepipeline-actions"));
 class PipelineStack extends cdk.Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
+    const buildProject = new codebuild.PipelineProject(this, "build", {
+      buildSpec: codebuild.BuildSpec.fromObject({
+        version: "0.2",
+        phases: {
+          install: {
+            commands: "npm install --silent"
+          },
+          build: {
+            commands: ["npm run build", "npm run synth"]
+          }
+        },
+        artifacts: {
+          "base-directory": "build",
+          files: ["wojtek-tinder-backend-dev.template.json", "functions/**/*"]
+        }
+      }),
+      environment: {
+        buildImage: codebuild.LinuxBuildImage.STANDARD_4_0
+      }
+    });
+    const sourceOutput = new codepipeline.Artifact();
+    const buildOutput = new codepipeline.Artifact("buildOutput");
+    new codepipeline.Pipeline(this, "pipeline", {
+      stages: [
+        {
+          stageName: "Source",
+          actions: [
+            new codepipelineActions.GitHubSourceAction({
+              actionName: "Checkout",
+              output: sourceOutput,
+              owner: "WojciechMatuszewski",
+              repo: "cdk-fun",
+              oauthToken: cdk.SecretValue.secretsManager("WojtekGHKey"),
+              trigger: codepipelineActions.GitHubTrigger.WEBHOOK
+            })
+          ]
+        },
+        {
+          stageName: "Build",
+          actions: [
+            new codepipelineActions.CodeBuildAction({
+              actionName: "build",
+              project: buildProject,
+              input: sourceOutput,
+              outputs: [buildOutput]
+            })
+          ]
+        }
+      ]
+    });
   }
 }

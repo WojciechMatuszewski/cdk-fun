@@ -27,6 +27,7 @@ __export(exports, {
 });
 const cdk = __toModule(require("@aws-cdk/core"));
 const lambda = __toModule(require("@aws-cdk/aws-lambda"));
+const apigwv2 = __toModule(require("@aws-cdk/aws-apigatewayv2"));
 class ApiConstruct extends cdk.Construct {
   constructor(scope, id) {
     super(scope, id);
@@ -40,6 +41,24 @@ class ApiConstruct extends cdk.Construct {
       code: this.lambdaCode,
       handler: "bar.handler",
       runtime: lambda.Runtime.NODEJS_12_X
+    });
+    const api = new apigwv2.HttpApi(this, "api", {createDefaultStage: false});
+    api.addStage("apiStage", {autoDeploy: true, stageName: "dev"});
+    const fooIntegration = new apigwv2.LambdaProxyIntegration({
+      handler: fooHandler
+    });
+    api.addRoutes({
+      path: "/foo",
+      methods: [apigwv2.HttpMethod.GET],
+      integration: fooIntegration
+    });
+    const barIntegration = new apigwv2.LambdaProxyIntegration({
+      handler: barHandler
+    });
+    api.addRoutes({
+      path: "/bar",
+      methods: [apigwv2.HttpMethod.GET],
+      integration: barIntegration
     });
   }
 }

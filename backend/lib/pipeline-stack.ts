@@ -47,13 +47,7 @@ export class PipelineStack extends cdk.Stack {
               output: sourceOutput,
               owner: "WojciechMatuszewski",
               repo: "cdk-fun",
-              oauthToken: new cdk.SecretValue(
-                ssm.StringParameter.fromStringParameterName(
-                  this,
-                  "GithubToken",
-                  "WojtekGHKey"
-                )
-              ),
+              oauthToken: cdk.SecretValue.secretsManager("WojtekGHKey"),
               trigger: codepipelineActions.GitHubTrigger.WEBHOOK
             })
           ]
