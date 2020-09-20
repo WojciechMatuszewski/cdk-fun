@@ -621,7 +621,7 @@
                     },
                     "source": {
                       "type": "CODEPIPELINE",
-                      "buildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"install\": {\n      \"commands\": \"npm install --silent\"\n    },\n    \"build\": {\n      \"commands\": [\n        \"npm run build\",\n        \"npm run synth\"\n      ]\n    }\n  },\n  \"artifacts\": {\n    \"base-directory\": \"build\",\n    \"files\": [\n      \"wojtek-tinder-backend-dev.template.json\",\n      \"functions/**/*\"\n    ]\n  }\n}"
+                      "buildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"install\": {\n      \"commands\": [\n        \"echo 'it works'\",\n        \"ls -l\",\n        \"cd backend\",\n        \"npm install --silent\"\n      ]\n    },\n    \"build\": {\n      \"commands\": [\n        \"npm run build\",\n        \"npm run synth\",\n        \"ls\"\n      ]\n    }\n  },\n  \"artifacts\": {\n    \"base-directory\": \"./backend/build\",\n    \"files\": [\n      \"wojtek-tinder-backend-dev.template.json\",\n      \"functions/**/*\"\n    ]\n  }\n}"
                     },
                     "encryptionKey": {
                       "Fn::GetAtt": [

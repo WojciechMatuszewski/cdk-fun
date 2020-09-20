@@ -37,14 +37,19 @@ class PipelineStack extends cdk.Stack {
         version: "0.2",
         phases: {
           install: {
-            commands: "npm install --silent"
+            commands: [
+              "echo 'it works'",
+              "ls -l",
+              "cd backend",
+              "npm install --silent"
+            ]
           },
           build: {
-            commands: ["npm run build", "npm run synth"]
+            commands: ["npm run build", "npm run synth", "ls"]
           }
         },
         artifacts: {
-          "base-directory": "build",
+          "base-directory": "./backend/build",
           files: ["wojtek-tinder-backend-dev.template.json", "functions/**/*"]
         }
       }),
