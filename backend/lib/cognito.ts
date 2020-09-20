@@ -22,6 +22,15 @@ export class CognitoConstruct extends cdk.Construct {
         requireLowercase: false,
         requireSymbols: false,
         requireUppercase: false
+      },
+      standardAttributes: {
+        email: {
+          mutable: true,
+          required: true
+        }
+      },
+      signInAliases: {
+        email: true
       }
     });
 
@@ -30,8 +39,22 @@ export class CognitoConstruct extends cdk.Construct {
       authFlows: {
         userPassword: true,
         refreshToken: true
-      }
+      },
+      generateSecret: false,
+      supportedIdentityProviders: [
+        cognito.UserPoolClientIdentityProvider.COGNITO
+      ]
     });
+
+    const autoConfirmEmailFunction = new lambda.Function(
+      this,
+      "autoConfirmEmail",
+      {
+        code: props.lambdaCode,
+        handler: "auto-confirm-email.handler",
+        runtime: lambda.Runtime.NODEJS_12_X
+      }
+    );
 
     const saveUserOnSignupFunction = new lambda.Function(
       this,
@@ -42,6 +65,12 @@ export class CognitoConstruct extends cdk.Construct {
         runtime: lambda.Runtime.NODEJS_12_X
       }
     );
+
+    cognitoUserPool.addTrigger(
+      cognito.UserPoolOperation.PRE_SIGN_UP,
+      autoConfirmEmailFunction
+    );
+
     cognitoUserPool.addTrigger(
       cognito.UserPoolOperation.POST_CONFIRMATION,
       saveUserOnSignupFunction

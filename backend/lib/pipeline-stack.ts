@@ -3,7 +3,6 @@ import * as lambda from "@aws-cdk/aws-lambda";
 import * as codebuild from "@aws-cdk/aws-codebuild";
 import * as codepipeline from "@aws-cdk/aws-codepipeline";
 import * as codepipelineActions from "@aws-cdk/aws-codepipeline-actions";
-import * as ssm from "@aws-cdk/aws-ssm";
 
 interface PipelineStackProps extends cdk.StackProps {
   readonly lambdaCode: lambda.CfnParametersCode;
@@ -18,7 +17,7 @@ export class PipelineStack extends cdk.Stack {
         version: "0.2",
         phases: {
           build: {
-            commands: ["cd build && npm run build-cdk", "npm run synth"]
+            commands: ["cd backend && npm run build-cdk", "npm run synth"]
           }
         },
         artifacts: {
