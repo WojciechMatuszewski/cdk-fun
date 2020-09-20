@@ -18,7 +18,7 @@ export class PipelineStack extends cdk.Stack {
         version: "0.2",
         phases: {
           install: {
-            commands: "cd backend && npm install --silent"
+            commands: ["ls", "cd backend && npm install --silent"]
           },
           build: {
             commands: [
