@@ -11,7 +11,7 @@ function newHandler(db: DocumentClient, tableName: string) {
 
     const userId = queryStringParameters.userId;
 
-    const userModel = new UserModel(db, process.env.TABLE_NAME as string);
+    const userModel = new UserModel(db, tableName as string);
     const matchesForUser = await userModel.usersForMatches(userId);
 
     return {
@@ -28,4 +28,4 @@ const handler = newHandler(
   process.env.TABLE_NAME as string
 );
 
-export { handler };
+export { handler, newHandler };

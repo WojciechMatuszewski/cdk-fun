@@ -65,7 +65,7 @@ class UserModel {
       })
       .promise();
 
-    return (Items as UserItem[]).map(this.fromUserItem);
+    return (Items as UserItem[]).map(this.fromUserItem.bind(this));
   }
 
   public async getUser(userId: string) {

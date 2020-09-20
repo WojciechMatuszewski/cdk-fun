@@ -15,7 +15,8 @@
     "noFallthroughCasesInSwitch": false,
     "strictPropertyInitialization": false,
     "esModuleInterop": true,
-    "noEmit": true
+    "noEmit": true,
+    "allowJs": true
   },
-  "exclude": ["cdk.out", "build"]
+  "exclude": ["cdk.out", "build", "cdk-build", "lambda-build"]
 }

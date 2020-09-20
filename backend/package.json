@@ -12,7 +12,8 @@
     "bootstrap": "npm run build && npm run cdk bootstrap -- -o cdk-build",
     "deploy": "npm run build && npm run synth && npm run cdk deploy -- -a cdk-build",
     "watch": "tsnd --respawn **/*.ts",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "test": "jest"
   },
   "devDependencies": {
     "@aws-cdk/assert": "1.63.0",
