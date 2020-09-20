@@ -85,12 +85,7 @@ export class PipelineStack extends cdk.Stack {
               input: sourceOutput,
               outputs: [cdkBuildOutput],
               runOrder: 1
-            })
-          ]
-        },
-        {
-          stageName: "Build",
-          actions: [
+            }),
             new codepipelineActions.CodeBuildAction({
               actionName: "BuildFunctions",
               project: buildFunctions,
