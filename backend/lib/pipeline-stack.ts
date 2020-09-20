@@ -37,14 +37,11 @@ export class PipelineStack extends cdk.Stack {
       buildSpec: codebuild.BuildSpec.fromObject({
         version: "0.2",
         phases: {
+          install: {
+            commands: ["cd backend", "ls", "npm run install --silent"]
+          },
           build: {
-            commands: [
-              "cd backend",
-              "npm run install --silent",
-              "ls -l",
-              "npm run build-cdk",
-              "npm run synth"
-            ]
+            commands: ["npm run build-cdk", "npm run synth"]
           }
         },
         artifacts: {
