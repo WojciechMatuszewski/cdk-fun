@@ -40,6 +40,7 @@ class UserModel {
 
   public async usersForMatches(userId: string) {
     const userItem = await this.getUserItem(userId);
+
     if (!userItem) {
       throw new Error("user not found");
     }
@@ -60,7 +61,7 @@ class UserModel {
         },
         FilterExpression: `NOT (:userId IN (:alreadyMatched))`,
         IndexName: "TypeCreatedAt",
-        KeyConditionExpression: `#type = :user and createdAt < :createdAt`
+        KeyConditionExpression: `#type = :type and createdAt < :createdAt`
       })
       .promise();
 
