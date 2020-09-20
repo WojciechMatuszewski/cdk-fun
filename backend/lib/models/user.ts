@@ -49,6 +49,9 @@ class UserModel {
     const { Items = [] } = await this.db
       .query({
         TableName: this.tableName,
+        ExpressionAttributeNames: {
+          "#type": "type"
+        },
         ExpressionAttributeValues: {
           ":userId": pk,
           ":alreadyMatched": alreadyMatched,
@@ -57,7 +60,7 @@ class UserModel {
         },
         FilterExpression: `NOT (:userId IN (:alreadyMatched))`,
         IndexName: "TypeCreatedAt",
-        KeyConditionExpression: `type = :user and createdAt < :createdAt`
+        KeyConditionExpression: `#type = :user and createdAt < :createdAt`
       })
       .promise();
 
