@@ -3,6 +3,7 @@ import * as lambda from "@aws-cdk/aws-lambda";
 import * as codebuild from "@aws-cdk/aws-codebuild";
 import * as codepipeline from "@aws-cdk/aws-codepipeline";
 import * as codepipelineActions from "@aws-cdk/aws-codepipeline-actions";
+import * as ssm from "@aws-cdk/aws-ssm";
 
 interface PipelineStackProps extends cdk.StackProps {
   readonly lambdaCode: lambda.CfnParametersCode;
@@ -45,8 +46,14 @@ export class PipelineStack extends cdk.Stack {
               actionName: "Checkout",
               output: sourceOutput,
               owner: "WojciechMatuszewski",
-              repo: "",
-              oauthToken: new cdk.SecretValue(""),
+              repo: "cdk-fun",
+              oauthToken: new cdk.SecretValue(
+                ssm.StringParameter.fromStringParameterName(
+                  this,
+                  "GithubToken",
+                  "WojtekGHKey"
+                )
+              ),
               trigger: codepipelineActions.GitHubTrigger.WEBHOOK
             })
           ]
