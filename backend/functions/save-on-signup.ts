@@ -20,6 +20,8 @@ const handler: PostConfirmationTriggerHandler = async event => {
     email,
     createdAt: new Date().toISOString()
   });
+
+  return event;
 };
 
 export { handler };
