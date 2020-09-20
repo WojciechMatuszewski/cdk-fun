@@ -51,11 +51,13 @@ class UserModel {
         TableName: this.tableName,
         ExpressionAttributeValues: {
           ":userId": pk,
-          ":alreadyMatched": alreadyMatched
+          ":alreadyMatched": alreadyMatched,
+          ":createdAt": createdAt,
+          ":type": "USER"
         },
         FilterExpression: `NOT (:userId IN (:alreadyMatched))`,
         IndexName: "TypeCreatedAt",
-        KeyConditionExpression: `type = USER and createdAt < ${createdAt}`
+        KeyConditionExpression: `type = :user and createdAt < :createdAt`
       })
       .promise();
 

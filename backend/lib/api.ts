@@ -1,7 +1,6 @@
 import * as cdk from "@aws-cdk/core";
 import * as lambda from "@aws-cdk/aws-lambda";
 import * as apigwv2 from "@aws-cdk/aws-apigatewayv2";
-import * as cognito from "@aws-cdk/aws-cognito";
 import * as dynamodb from "@aws-cdk/aws-dynamodb";
 import { CognitoConstruct } from "./cognito";
 
@@ -27,37 +26,35 @@ export class ApiConstruct extends cdk.Construct {
       lambdaCode: this.lambdaCode
     });
 
-    const fooHandler = new lambda.Function(this, "fooHandler", {
-      code: this.lambdaCode,
-      handler: "foo.handler",
-      runtime: lambda.Runtime.NODEJS_12_X
-    });
-
-    const barHandler = new lambda.Function(this, "barHandler", {
-      code: this.lambdaCode,
-      handler: "bar.handler",
-      runtime: lambda.Runtime.NODEJS_12_X
-    });
-
     const api = new apigwv2.HttpApi(this, "api", { createDefaultStage: false });
     api.addStage("apiStage", { autoDeploy: true, stageName: "dev" });
 
-    const fooIntegration = new apigwv2.LambdaProxyIntegration({
-      handler: fooHandler
-    });
-    api.addRoutes({
-      path: "/foo",
-      methods: [apigwv2.HttpMethod.GET],
-      integration: fooIntegration
+    const generateMatchesHandler = new lambda.Function(
+      this,
+      "generateMatches",
+      {
+        runtime: lambda.Runtime.NODEJS_12_X,
+        handler: "generate-matches.handler",
+        code: this.lambdaCode,
+        environment: {
+          TABLE_NAME: table.tableName
+        }
+      }
+    );
+    table.grantReadData(generateMatchesHandler);
+
+    const generateMatchesIntegration = new apigwv2.LambdaProxyIntegration({
+      handler: generateMatchesHandler
     });
 
-    const barIntegration = new apigwv2.LambdaProxyIntegration({
-      handler: barHandler
-    });
     api.addRoutes({
-      path: "/bar",
+      path: "/matches",
       methods: [apigwv2.HttpMethod.GET],
-      integration: barIntegration
+      integration: generateMatchesIntegration
+    });
+
+    new cdk.CfnOutput(this, "apiUrl", {
+      value: api.url ?? "something went wrong :c"
     });
   }
 }
