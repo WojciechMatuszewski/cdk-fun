@@ -1,6 +1,9 @@
 import * as cdk from "@aws-cdk/core";
 import * as lambda from "@aws-cdk/aws-lambda";
 import * as apigwv2 from "@aws-cdk/aws-apigatewayv2";
+import * as cognito from "@aws-cdk/aws-cognito";
+import * as dynamodb from "@aws-cdk/aws-dynamodb";
+import { CognitoConstruct } from "./cognito";
 
 export class ApiConstruct extends cdk.Construct {
   public readonly lambdaCode: lambda.CfnParametersCode;
@@ -8,7 +11,16 @@ export class ApiConstruct extends cdk.Construct {
   constructor(scope: cdk.Construct, id: string) {
     super(scope, id);
 
+    const table = new dynamodb.Table(this, "table", {
+      partitionKey: { name: "pk", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "sk", type: dynamodb.AttributeType.STRING }
+    });
     this.lambdaCode = lambda.Code.fromCfnParameters();
+
+    new CognitoConstruct(this, "cognito", {
+      table,
+      lambdaCode: this.lambdaCode
+    });
 
     const fooHandler = new lambda.Function(this, "fooHandler", {
       code: this.lambdaCode,

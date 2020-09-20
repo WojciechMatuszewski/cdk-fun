@@ -17,11 +17,8 @@ export class PipelineStack extends cdk.Stack {
       buildSpec: codebuild.BuildSpec.fromObject({
         version: "0.2",
         phases: {
-          install: {
-            commands: ["cd backend", "npm install --silent"]
-          },
           build: {
-            commands: ["npm run build-cdk", "npm run synth"]
+            commands: ["cd build && npm run build-cdk", "npm run synth"]
           }
         },
         artifacts: {
@@ -34,15 +31,33 @@ export class PipelineStack extends cdk.Stack {
       }
     });
 
+    const installDependencies = new codebuild.PipelineProject(
+      this,
+      "install-deps",
+      {
+        buildSpec: codebuild.BuildSpec.fromObject({
+          version: "0.2",
+          phases: {
+            install: {
+              commands: ["cd backend", "npm install --silent", "cd .."]
+            }
+          },
+          artifacts: {
+            files: ["**/*"]
+          }
+        }),
+        environment: {
+          buildImage: codebuild.LinuxBuildImage.STANDARD_4_0
+        }
+      }
+    );
+
     const buildFunctions = new codebuild.PipelineProject(this, "lambda-build", {
       buildSpec: codebuild.BuildSpec.fromObject({
         version: "0.2",
         phases: {
-          install: {
-            commands: ["cd backend", "npm install --silent"]
-          },
           build: {
-            commands: ["npm run build-functions"]
+            commands: ["cd backend && npm run build-functions"]
           }
         },
         artifacts: {
@@ -56,6 +71,7 @@ export class PipelineStack extends cdk.Stack {
     });
 
     const sourceOutput = new codepipeline.Artifact();
+    const installOutput = new codepipeline.Artifact();
     const cdkBuildOutput = new codepipeline.Artifact("cdkBuildOutput");
     const functionsBuildOutput = new codepipeline.Artifact(
       "functionsBuildOutput"
@@ -77,19 +93,30 @@ export class PipelineStack extends cdk.Stack {
           ]
         },
         {
+          stageName: "Install",
+          actions: [
+            new codepipelineActions.CodeBuildAction({
+              actionName: "InstallDependencies",
+              project: installDependencies,
+              input: sourceOutput,
+              outputs: [installOutput]
+            })
+          ]
+        },
+        {
           stageName: "Build",
           actions: [
             new codepipelineActions.CodeBuildAction({
               actionName: "BuildCDK",
               project: buildCDK,
-              input: sourceOutput,
+              input: installOutput,
               outputs: [cdkBuildOutput],
               runOrder: 1
             }),
             new codepipelineActions.CodeBuildAction({
               actionName: "BuildFunctions",
               project: buildFunctions,
-              input: sourceOutput,
+              input: installOutput,
               outputs: [functionsBuildOutput],
               runOrder: 1
             })
