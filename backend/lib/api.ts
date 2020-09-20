@@ -15,6 +15,11 @@ export class ApiConstruct extends cdk.Construct {
       partitionKey: { name: "pk", type: dynamodb.AttributeType.STRING },
       sortKey: { name: "sk", type: dynamodb.AttributeType.STRING }
     });
+    table.addGlobalSecondaryIndex({
+      indexName: "TypeCreatedAt",
+      partitionKey: { name: "type", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "createdAt", type: dynamodb.AttributeType.STRING }
+    });
     this.lambdaCode = lambda.Code.fromCfnParameters();
 
     new CognitoConstruct(this, "cognito", {

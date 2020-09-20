@@ -38,25 +38,54 @@ class UserModel {
       .promise();
   }
 
-  public async getUser(id: string) {
-    const key = this.toKey(id);
+  public async usersForMatches(userId: string) {
+    const userItem = await this.getUserItem(userId);
+    if (!userItem) {
+      throw new Error("user not found");
+    }
 
-    const result = await this.db
+    const { createdAt, pk, alreadyMatched } = userItem;
+
+    const { Items = [] } = await this.db
+      .query({
+        TableName: this.tableName,
+        ExpressionAttributeValues: {
+          ":userId": pk,
+          ":alreadyMatched": alreadyMatched
+        },
+        FilterExpression: `NOT (:userId IN (:alreadyMatched))`,
+        IndexName: "TypeCreatedAt",
+        KeyConditionExpression: `type = USER and createdAt < ${createdAt}`
+      })
+      .promise();
+
+    return (Items as UserItem[]).map(this.fromUserItem);
+  }
+
+  public async getUser(userId: string) {
+    const userItem = await this.getUserItem(userId);
+    if (!userItem) return null;
+
+    return this.fromUserItem(userItem);
+  }
+
+  private async getUserItem(userId: string) {
+    const key = this.toKey(userId);
+
+    const { Item } = await this.db
       .get({
         TableName: this.tableName,
         Key: key
       })
       .promise();
 
-    if (!result.Item) return null;
-
-    return this.fromUserItem(result.Item as UserItem);
+    return Item as UserItem;
   }
 
-  private toKey(id: string): UserKey {
+  private toKey(userId: string): UserKey {
     return {
-      pk: `USER#${id}`,
-      sk: `USER#${id}`
+      pk: `USER#${userId}`,
+      sk: `USER#${userId}`
     };
   }
 
@@ -66,12 +95,14 @@ class UserModel {
 
   private toUserItem(user: User): UserItem {
     const { id, ...restOfUser } = user;
+    const key = this.toKey(user.id);
+
     return {
-      ...this.toKey(user.id),
+      ...key,
       ...restOfUser,
       matchIndex: null,
       type: "USER",
-      alreadyMatched: [user.id]
+      alreadyMatched: [key.pk]
     };
   }
 
