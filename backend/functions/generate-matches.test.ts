@@ -1,21 +1,17 @@
 import { newHandler } from "./generate-matches";
-import { setup, dropTable } from "../test/dynamo";
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import { UserModel } from "../lib/models/user";
 import { APIGatewayProxyStructuredResultV2 } from "aws-lambda";
+import { dropTable, setup, TEST_TABLE_NAME } from "test/dynamo";
 
-beforeEach(async () => await setup());
+let db: DocumentClient;
+beforeEach(async () => (db = await setup()));
 afterEach(async () => await dropTable());
 
 test("it works", async () => {
-  const db = new DocumentClient({
-    endpoint: "http://localhost:8000",
-    region: "local"
-  });
+  const handler = newHandler(db, TEST_TABLE_NAME);
 
-  const handler = newHandler(db, "TestTable");
-
-  const userModel = new UserModel(db, "TestTable");
+  const userModel = new UserModel(db, TEST_TABLE_NAME);
 
   await userModel.saveUser({
     id: "1",

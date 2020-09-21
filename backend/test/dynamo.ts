@@ -1,4 +1,14 @@
 import { DynamoDB } from "aws-sdk";
+import { DocumentClient } from "aws-sdk/clients/dynamodb";
+import { exec } from "child_process";
+import util from "util";
+
+const execPromise = util.promisify(exec);
+
+const port = "8000";
+const endpoint = `http://localhost:${port}`;
+
+export const TEST_TABLE_NAME = "TestTable";
 
 async function createTable(db: DynamoDB) {
   await db
@@ -23,31 +33,49 @@ async function createTable(db: DynamoDB) {
           Projection: { ProjectionType: "ALL" }
         }
       ],
-      TableName: "TestTable",
+      TableName: TEST_TABLE_NAME,
       BillingMode: "PAY_PER_REQUEST"
     })
     .promise();
 }
 
 async function setup() {
+  await spinContainer();
+
   const dynamodb = new DynamoDB({
     region: "local",
-    endpoint: "http://localhost:8000"
+    endpoint: endpoint
   });
 
   await createTable(dynamodb);
+
+  return new DocumentClient({
+    region: "local",
+    endpoint: endpoint
+  });
 }
 
 async function dropTable() {
   const dynamodb = new DynamoDB({
     region: "local",
-    endpoint: "http://localhost:8000"
+    endpoint: endpoint
   });
 
   await dynamodb.deleteTable({ TableName: "TestTable" }).promise();
 }
 
-export { setup, dropTable };
+async function spinContainer() {
+  const isRunningCMD = `docker ps -q -f name=cdk-twitter-dynamo`;
+  const spinContainerCMD = `docker run -d -p ${port}:${port} --name cdk-twitter-dynamo amazon/dynamodb-local`;
 
-// setup();
-// dropTable();
+  try {
+    const { stdout } = await execPromise(isRunningCMD);
+    if (stdout === "") {
+      await execPromise(spinContainerCMD);
+    }
+  } catch (e) {
+    throw new Error(`Could not spin the dynamo container: ${e.message}`);
+  }
+}
+
+export { setup, dropTable, spinContainer };

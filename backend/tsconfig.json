@@ -16,7 +16,11 @@
     "strictPropertyInitialization": false,
     "esModuleInterop": true,
     "noEmit": true,
-    "allowJs": true
+    "allowJs": true,
+    "baseUrl": ".",
+    "paths": {
+      "test/*": ["./test/*"]
+    }
   },
   "exclude": ["cdk.out", "build", "cdk-build", "lambda-build"]
 }
