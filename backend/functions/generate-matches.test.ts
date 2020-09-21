@@ -8,7 +8,7 @@ let db: DocumentClient;
 beforeEach(async () => (db = await setup()));
 afterEach(async () => await dropTable());
 
-test("it works", async () => {
+test("matches wip", async () => {
   const handler = newHandler(db, TEST_TABLE_NAME);
 
   const userModel = new UserModel(db, TEST_TABLE_NAME);
@@ -25,11 +25,9 @@ test("it works", async () => {
     createdAt: new Date(2011).toISOString()
   });
 
-  const result = (await handler(
-    { queryStringParameters: { userId: "2" } } as any,
-    {} as any,
-    () => {}
-  )) as APIGatewayProxyStructuredResultV2;
+  const result = (await handler({
+    queryStringParameters: { userId: "2" }
+  } as any)) as APIGatewayProxyStructuredResultV2;
 
   expect(result.statusCode).toBe(200);
   expect(JSON.parse(result.body as any)).toEqual([

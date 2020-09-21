@@ -1,11 +1,15 @@
-import { APIGatewayProxyHandlerV2 } from "aws-lambda";
+import {
+  APIGatewayProxyEventV2,
+  APIGatewayProxyHandlerV2,
+  APIGatewayProxyResultV2
+} from "aws-lambda";
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import { UserModel } from "../lib/models/user";
 
 function newHandler(db: DocumentClient, tableName: string) {
-  const createdHandler: APIGatewayProxyHandlerV2 = async ({
+  const createdHandler = async ({
     queryStringParameters
-  }) => {
+  }: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
     if (!queryStringParameters)
       return { statusCode: 200, body: "NO query params" };
 

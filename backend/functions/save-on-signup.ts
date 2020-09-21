@@ -1,11 +1,13 @@
-import { PostConfirmationTriggerHandler } from "aws-lambda";
+import { PostConfirmationTriggerEvent } from "aws-lambda";
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import { UserModel } from "../lib/models/user";
 
 export function newHandler(db: DocumentClient, tableName: string) {
-  const createdHandler: PostConfirmationTriggerHandler = async event => {
+  const createdHandler = async (
+    event: PostConfirmationTriggerEvent
+  ): Promise<PostConfirmationTriggerEvent> => {
     if (event.triggerSource === "PostConfirmation_ConfirmForgotPassword")
-      return;
+      return event;
 
     const userModel = new UserModel(db, tableName);
 

@@ -19,7 +19,8 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "test/*": ["./test/*"]
+      "test/*": ["./test/*"],
+      "*": ["*"]
     }
   },
   "exclude": ["cdk.out", "build", "cdk-build", "lambda-build"]
