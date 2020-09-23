@@ -21,7 +21,11 @@ async function buildCDK() {
 }
 
 async function buildFunctions() {
-  const entryPoints = await fg(["./functions/**/*.ts", "!node_modules"]);
+  const entryPoints = await fg([
+    "./functions/**/*.ts",
+    "!./functions/**/*.test.ts",
+    "!node_modules"
+  ]);
 
   await build({
     entryPoints,

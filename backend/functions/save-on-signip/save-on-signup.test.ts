@@ -1,6 +1,6 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import { dropTable, setup, TEST_TABLE_NAME } from "test/dynamo";
-import { User, UserModel } from "../lib/models/user";
+import { User, UserModel } from "../../lib/models/user";
 import { newHandler } from "./save-on-signup";
 
 let db: DocumentClient;

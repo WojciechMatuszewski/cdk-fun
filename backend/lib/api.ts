@@ -3,6 +3,8 @@ import * as lambda from "@aws-cdk/aws-lambda";
 import * as apigwv2 from "@aws-cdk/aws-apigatewayv2";
 import * as dynamodb from "@aws-cdk/aws-dynamodb";
 import { CognitoConstruct } from "./cognito";
+import * as s3_assets from "@aws-cdk/aws-s3-assets";
+import { join } from "path";
 
 export class ApiConstruct extends cdk.Construct {
   public readonly lambdaCode: lambda.CfnParametersCode;
@@ -29,13 +31,25 @@ export class ApiConstruct extends cdk.Construct {
     const api = new apigwv2.HttpApi(this, "api", { createDefaultStage: false });
     api.addStage("apiStage", { autoDeploy: true, stageName: "dev" });
 
+    const matchesHandlerAsset = new s3_assets.Asset(this, "matchesHandler", {
+      path: join(__dirname, "../functions/generate-matches")
+    });
+
+    this.lambdaCode.assign({
+      bucketName: matchesHandlerAsset.s3BucketName,
+      objectKey: matchesHandlerAsset.s3ObjectKey
+    });
+
     const generateMatchesHandler = new lambda.Function(
       this,
       "generateMatches",
       {
         runtime: lambda.Runtime.NODEJS_12_X,
         handler: "generate-matches.handler",
-        code: this.lambdaCode,
+        code: lambda.Code.fromBucket(
+          matchesHandlerAsset.bucket,
+          matchesHandlerAsset.s3ObjectKey
+        ),
         environment: {
           TABLE_NAME: table.tableName
         }

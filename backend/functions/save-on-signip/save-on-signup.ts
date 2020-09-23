@@ -1,6 +1,6 @@
 import { PostConfirmationTriggerEvent } from "aws-lambda";
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
-import { UserModel } from "../lib/models/user";
+import { UserModel } from "../../lib/models/user";
 
 export function newHandler(db: DocumentClient, tableName: string) {
   const createdHandler = async (
