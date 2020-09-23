@@ -32,7 +32,7 @@ export class ApiConstruct extends cdk.Construct {
     api.addStage("apiStage", { autoDeploy: true, stageName: "dev" });
 
     const matchesHandlerAsset = new s3_assets.Asset(this, "matchesHandler", {
-      path: join(__dirname, "../../functions/generate-matches")
+      path: join(__dirname, "../../functions-build/generate-matches")
     });
 
     this.lambdaCode.assign({
