@@ -1,6 +1,6 @@
 import { newHandler } from "./generate-matches";
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
-import { UserModel } from "../../lib/models/user";
+import { UserModel } from "../lib/models/user";
 import { APIGatewayProxyStructuredResultV2 } from "aws-lambda";
 import { dropTable, setup, TEST_TABLE_NAME } from "test/dynamo";
 

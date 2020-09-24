@@ -2,9 +2,9 @@ import * as cdk from "@aws-cdk/core";
 import * as cognito from "@aws-cdk/aws-cognito";
 import * as lambda from "@aws-cdk/aws-lambda";
 import * as dynamodb from "@aws-cdk/aws-dynamodb";
+import { getLambdaDir } from "./common/common";
 
 type Props = {
-  lambdaCode: lambda.CfnParametersCode;
   table: dynamodb.Table;
 };
 
@@ -51,9 +51,9 @@ export class CognitoConstruct extends cdk.Construct {
       this,
       "autoConfirmEmail",
       {
-        code: props.lambdaCode,
         handler: "auto-confirm-email.handler",
-        runtime: lambda.Runtime.NODEJS_12_X
+        runtime: lambda.Runtime.NODEJS_12_X,
+        code: lambda.Code.fromAsset(getLambdaDir())
       }
     );
 
@@ -61,8 +61,8 @@ export class CognitoConstruct extends cdk.Construct {
       this,
       "saveUserOnSignup",
       {
-        code: props.lambdaCode,
         handler: "save-on-signup.handler",
+        code: lambda.Code.fromAsset(getLambdaDir()),
         runtime: lambda.Runtime.NODEJS_12_X,
         environment: {
           TABLE_NAME: props.table.tableName
