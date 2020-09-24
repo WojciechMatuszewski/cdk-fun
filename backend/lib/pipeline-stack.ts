@@ -29,8 +29,8 @@ export class PipelineStack extends cdk.Stack {
         sourceArtifact,
         cloudAssemblyArtifact,
         installCommands: ["cd backend", "npm install"],
-        buildCommands: ["cd backend", "npm run build"],
-        synthCommand: "cd backend && npm run synth"
+        buildCommands: ["npm run build"],
+        synthCommand: "npm run synth"
       })
     });
 

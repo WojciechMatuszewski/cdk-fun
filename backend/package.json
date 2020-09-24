@@ -7,10 +7,10 @@
   "scripts": {
     "build-cdk": "node build cdk",
     "build-functions": "node build functions",
-    "build": "rm -rf build && npm run build-functions && npm run build-cdk",
+    "build": "rm -rf cdk-build && rm -rf functions-build && npm run build-functions && npm run build-cdk",
     "synth": "npm run cdk synth -- -a cdk-build/bin/backend.js",
     "bootstrap": "npm run build && npm run cdk bootstrap -- -o cdk-build",
-    "deploy": "npm run build && npm run synth && npm run cdk deploy -- -a cdk-build",
+    "deploy": "rm -rf cdk.out && npm run build && npm run synth && npm run cdk deploy -- -a cdk-build/bin/backend.js",
     "watch": "tsnd --respawn **/*.ts",
     "cdk": "cdk",
     "test": "jest"
