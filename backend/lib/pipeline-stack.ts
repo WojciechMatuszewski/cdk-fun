@@ -15,6 +15,7 @@ export class PipelineStack extends cdk.Stack {
 
     const pipeline = new pipelines.CdkPipeline(this, "Pipeline", {
       pipelineName: "MyAppPipeline",
+
       cloudAssemblyArtifact,
       sourceAction: new codepipelineActions.GitHubSourceAction({
         actionName: "Checkout",
@@ -27,9 +28,9 @@ export class PipelineStack extends cdk.Stack {
       synthAction: new pipelines.SimpleSynthAction({
         sourceArtifact,
         cloudAssemblyArtifact,
-        installCommands: ["npm install"],
-        buildCommands: ["npm run build"],
-        synthCommand: "npm run synth"
+        installCommands: ["cd backend", "npm install"],
+        buildCommands: ["cd backend", "npm run build"],
+        synthCommand: "cd backend && npm run synth"
       })
     });
 
