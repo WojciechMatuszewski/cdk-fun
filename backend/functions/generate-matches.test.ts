@@ -25,12 +25,23 @@ test("matches wip", async () => {
     createdAt: new Date(2011).toISOString()
   });
 
+  await userModel.saveUser({
+    id: "3",
+    email: "third@third.com",
+    createdAt: new Date(2010).toISOString()
+  });
+
   const result = (await handler({
     queryStringParameters: { userId: "2" }
   } as any)) as APIGatewayProxyStructuredResultV2;
 
   expect(result.statusCode).toBe(200);
-  expect(JSON.parse(result.body as any)).toEqual([
-    expect.objectContaining({ id: "1" })
-  ]);
+
+  const matchesResult = await userModel.getMatches("2");
+  console.log(matchesResult);
+  // console.log(result);
+  // expect(JSON.parse(result.body as any)).toEqual([
+  //   expect.objectContaining({ id: "1" }),
+  //   expect.objectContaining({ id: "3" })
+  // ]);
 });

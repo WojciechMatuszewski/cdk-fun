@@ -1,4 +1,5 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
+import type { DynamoDB } from "aws-sdk";
 
 interface UserKey {
   pk: string;
@@ -9,8 +10,7 @@ interface UserItem extends UserKey {
   email: string;
   type: string;
   createdAt: string;
-  matchIndex: string | null;
-  alreadyMatched: string[];
+  matchIndex: DynamoDB.DocumentClient.Key | string;
 }
 
 type User = {
@@ -38,16 +38,19 @@ class UserModel {
       .promise();
   }
 
-  public async usersForMatches(userId: string) {
+  public async getMatchedUsers(userId: string) {
     const userItem = await this.getUserItem(userId);
 
     if (!userItem) {
       throw new Error("user not found");
     }
 
-    const { createdAt, pk, alreadyMatched } = userItem;
+    const { createdAt, pk, sk, matchIndex } = userItem;
+    const paginationPayload = this.shouldIncludePaginationInfo(matchIndex)
+      ? { ExclusiveStartKey: matchIndex }
+      : {};
 
-    const { Items = [] } = await this.db
+    const { Items: userItems = [], LastEvaluatedKey, $response } = await this.db
       .query({
         TableName: this.tableName,
         ExpressionAttributeNames: {
@@ -55,17 +58,89 @@ class UserModel {
         },
         ExpressionAttributeValues: {
           ":userId": pk,
-          ":alreadyMatched": alreadyMatched,
           ":createdAt": createdAt,
           ":type": "USER"
         },
-        FilterExpression: `NOT (:userId IN (:alreadyMatched))`,
+        FilterExpression: `not (pk = :userId)`,
         IndexName: "TypeCreatedAt",
-        KeyConditionExpression: `#type = :type and createdAt < :createdAt`
+        KeyConditionExpression: `#type = :type and createdAt < :createdAt`,
+        ...paginationPayload,
+        Limit: 5
       })
       .promise();
 
-    return (Items as UserItem[]).map(this.fromUserItem.bind(this));
+    const matches = (userItems as UserItem[]).map(this.fromUserItem.bind(this));
+
+    if (!LastEvaluatedKey) return matches;
+
+    await this.db
+      .update({
+        Key: { pk, sk },
+        TableName: this.tableName,
+        UpdateExpression: "SET matchIndex = :matchIndex",
+        ExpressionAttributeValues: {
+          ":matchIndex": LastEvaluatedKey
+        }
+      })
+      .promise();
+
+    return matches;
+  }
+
+  public async generateMatches(userId: string) {
+    const matchedUsers = await this.getMatchedUsers(userId);
+    if (matchedUsers.length == 0) return;
+
+    const matchesForUser: DynamoDB.DocumentClient.WriteRequest[] = matchedUsers.map(
+      matchedUser => {
+        return {
+          PutRequest: {
+            Item: {
+              pk: `USER#${userId}`,
+              sk: `MATCH#${matchedUser.id}`,
+              type: "MATCH"
+            }
+          }
+        };
+      }
+    );
+
+    const matchesForMatches: DynamoDB.DocumentClient.WriteRequest[] = matchedUsers.map(
+      matchedUser => {
+        return {
+          PutRequest: {
+            Item: {
+              pk: `USER#${matchedUser.id}`,
+              sk: `MATCH#${userId}`,
+              type: "MATCH"
+            }
+          }
+        };
+      }
+    );
+
+    await this.db
+      .batchWrite({
+        RequestItems: {
+          [this.tableName]: [...matchesForUser, ...matchesForMatches]
+        }
+      })
+      .promise();
+  }
+
+  public async getMatches(userId: string) {
+    const result = await this.db
+      .query({
+        TableName: this.tableName,
+        ExpressionAttributeValues: {
+          ":userId": `USER#${userId}`,
+          ":sk": `MATCH`
+        },
+        KeyConditionExpression: `pk = :userId AND begins_with(sk, :sk)`
+      })
+      .promise();
+
+    return result.Items;
   }
 
   public async getUser(userId: string) {
@@ -106,9 +181,8 @@ class UserModel {
     return {
       ...key,
       ...restOfUser,
-      matchIndex: null,
-      type: "USER",
-      alreadyMatched: [key.pk]
+      matchIndex: "INITIAL",
+      type: "USER"
     };
   }
 
@@ -118,6 +192,12 @@ class UserModel {
       email: userItem.email,
       createdAt: userItem.createdAt
     };
+  }
+
+  private shouldIncludePaginationInfo(
+    currentMatchIndex: UserItem["matchIndex"]
+  ): currentMatchIndex is DynamoDB.DocumentClient.Key {
+    return currentMatchIndex != "INITIAL";
   }
 }
 

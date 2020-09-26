@@ -21,14 +21,14 @@ async function createTable(db: DynamoDB) {
       ],
       KeySchema: [
         { AttributeName: "pk", KeyType: "HASH" },
-        { AttributeName: "sk", KeyType: "SORT" }
+        { AttributeName: "sk", KeyType: "RANGE" }
       ],
       GlobalSecondaryIndexes: [
         {
           IndexName: "TypeCreatedAt",
           KeySchema: [
             { AttributeName: "type", KeyType: "HASH" },
-            { AttributeName: "createdAt", KeyType: "SORT" }
+            { AttributeName: "createdAt", KeyType: "RANGE" }
           ],
           Projection: { ProjectionType: "ALL" }
         }
@@ -69,7 +69,8 @@ async function spinContainer() {
   const spinContainerCMD = `docker run -d -p ${port}:${port} --name cdk-twitter-dynamo amazon/dynamodb-local`;
 
   try {
-    const { stdout } = await execPromise(isRunningCMD);
+    const { stdout, stderr } = await execPromise(isRunningCMD);
+    if (stderr !== "") throw new Error(stderr);
     if (stdout === "") {
       await execPromise(spinContainerCMD);
     }

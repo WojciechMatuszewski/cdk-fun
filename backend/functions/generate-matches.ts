@@ -16,11 +16,11 @@ function newHandler(db: DocumentClient, tableName: string) {
     const userId = queryStringParameters.userId;
 
     const userModel = new UserModel(db, tableName as string);
-    const matchesForUser = await userModel.usersForMatches(userId);
+    await userModel.generateMatches(userId);
 
     return {
       statusCode: 200,
-      body: JSON.stringify(matchesForUser)
+      body: JSON.stringify("works")
     };
   };
 
